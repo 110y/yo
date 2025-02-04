@@ -116,13 +116,18 @@ func (s *SpannerLoaderFromDDL) ColumnList(name string) ([]*models.Column, error)
 
 	for i, c := range table.Columns {
 		_, pk := check[c.Name.Name]
+		allowCommitTimestamp := false
+		if c.Options != nil {
+			allowCommitTimestamp = c.Options.AllowCommitTimestamp
+		}
 		cols = append(cols, &models.Column{
-			FieldOrdinal: i + 1,
-			ColumnName:   c.Name.Name,
-			DataType:     c.Type.SQL(),
-			NotNull:      c.NotNull,
-			IsPrimaryKey: pk,
-			IsGenerated:  c.GeneratedExpr != nil,
+			FieldOrdinal:         i + 1,
+			ColumnName:           c.Name.Name,
+			DataType:             c.Type.SQL(),
+			NotNull:              c.NotNull,
+			IsPrimaryKey:         pk,
+			IsGenerated:          c.GeneratedExpr != nil,
+			AllowCommitTimestamp: allowCommitTimestamp,
 		})
 	}
 
